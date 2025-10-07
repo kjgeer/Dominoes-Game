@@ -1,0 +1,103 @@
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    background-color: #f0f0f0;
+    padding: 20px;
+}
+
+h1 {
+    color: #333;
+}
+
+#scoreboard {
+    margin-bottom: 10px;
+}
+
+#modeSelection {
+    margin-bottom: 20px;
+}
+
+#instructions {
+    max-width: 800px;
+    margin: 0 auto 20px;
+    text-align: left;
+    background: #fff;
+    padding: 10px;
+    border: 1px solid #ccc;
+}
+
+#gameArea {
+    margin-top: 20px;
+}
+
+#tableArea {
+    width: 800px;
+    overflow-x: auto;
+    margin: 0 auto;
+    border: 1px solid #000;
+    background-color: #e0e0e0;
+}
+
+#tableCanvas {
+    background-color: #e0e0e0;
+}
+
+#gameInfo {
+    margin: 10px 0;
+}
+
+#playerHands {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 20px;
+}
+
+#player1Hand, #player2Hand {
+    border: 1px solid #ccc;
+    padding: 10px;
+    width: 800px;
+    background-color: #fff;
+    overflow-x: auto;
+    white-space: nowrap;
+}
+
+.hand.hidden {
+    background-color: #666;
+    position: relative;
+}
+
+.hand.hidden canvas {
+    display: none;
+}
+
+.hand.hidden::after {
+    content: attr(data-count) " pieces";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+#gameLog {
+    max-width: 800px;
+    margin: 20px auto;
+    text-align: left;
+    background: #fff;
+    padding: 10px;
+    border: 1px solid #ccc;
+}
+
+#logContent {
+    white-space: pre-line;
+    overflow-y: auto;
+    max-height: 300px;
+}
+
+#scoreboard select, #scoreboard input {
+    margin-left: 10px;
+    padding: 5px;
+}
