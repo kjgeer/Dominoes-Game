@@ -1,0 +1,16 @@
+apiVersion: v2
+name: dominoes-game
+description: A Helm chart for Dominoes Game on Kubernetes
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+keywords:
+  - dominoes
+  - game
+  - nginx
+maintainers:
+  - name: Your Team
+    email: team@example.com
+home: https://github.com/ArsalanAnwer0/Dominoes-Game
+sources:
+  - https://github.com/ArsalanAnwer0/Dominoes-Game
