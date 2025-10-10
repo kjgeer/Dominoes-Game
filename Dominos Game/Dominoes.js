@@ -1,34 +1,138 @@
-// Pip positions for drawing dominoes (0 to 6)
+// ========================================
+// LANDING PAGE DOMINOES
+// ========================================
+
+function drawLandingDominoes() {
+    const canvas1 = document.getElementById('domino1');
+    if (canvas1) {
+        const ctx1 = canvas1.getContext('2d');
+        drawDecorativeDomino(ctx1, 5, 4);
+    }
+    
+    const canvas2 = document.getElementById('domino2');
+    if (canvas2) {
+        const ctx2 = canvas2.getContext('2d');
+        drawDecorativeDomino(ctx2, 6, 6);
+    }
+    
+    const canvas3 = document.getElementById('domino3');
+    if (canvas3) {
+        const ctx3 = canvas3.getContext('2d');
+        drawDecorativeDomino(ctx3, 4, 1);
+    }
+}
+
+function drawDecorativeDomino(ctx, val1, val2) {
+    const w = 120;
+    const h = 180;
+    const radius = 16;
+    
+    ctx.fillStyle = '#f5f5f0';
+    ctx.fillRect(0, 0, w, h);
+    
+    ctx.fillStyle = 'white';
+    ctx.beginPath();
+    ctx.moveTo(radius, 0);
+    ctx.lineTo(w - radius, 0);
+    ctx.quadraticCurveTo(w, 0, w, radius);
+    ctx.lineTo(w, h - radius);
+    ctx.quadraticCurveTo(w, h, w - radius, h);
+    ctx.lineTo(radius, h);
+    ctx.quadraticCurveTo(0, h, 0, h - radius);
+    ctx.lineTo(0, radius);
+    ctx.quadraticCurveTo(0, 0, radius, 0);
+    ctx.closePath();
+    ctx.fill();
+    
+    ctx.strokeStyle = '#e5e5e5';
+    ctx.lineWidth = 3;
+    ctx.stroke();
+    
+    ctx.beginPath();
+    ctx.moveTo(0, h / 2);
+    ctx.lineTo(w, h / 2);
+    ctx.strokeStyle = '#e5e5e5';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    
+    drawPipsDecorative(ctx, w / 2, h / 4, w * 0.4, h * 0.4, val1);
+    drawPipsDecorative(ctx, w / 2, h * 0.75, w * 0.4, h * 0.4, val2);
+}
+
+function drawPipsDecorative(ctx, centerX, centerY, w, h, val) {
+    if (val === 0) return;
+    ctx.fillStyle = '#1a1a1a';
+    const r = 6;
+    
+    const positions = [
+        [],
+        [[0.5, 0.5]],
+        [[0.3, 0.3], [0.7, 0.7]],
+        [[0.3, 0.3], [0.5, 0.5], [0.7, 0.7]],
+        [[0.3, 0.3], [0.3, 0.7], [0.7, 0.3], [0.7, 0.7]],
+        [[0.3, 0.3], [0.3, 0.7], [0.5, 0.5], [0.7, 0.3], [0.7, 0.7]],
+        [[0.3, 0.3], [0.3, 0.5], [0.3, 0.7], [0.7, 0.3], [0.7, 0.5], [0.7, 0.7]]
+    ];
+    
+    positions[val].forEach(pos => {
+        const px = centerX - w / 2 + pos[0] * w;
+        const py = centerY - h / 2 + pos[1] * h;
+        ctx.beginPath();
+        ctx.arc(px, py, r, 0, 2 * Math.PI);
+        ctx.fill();
+    });
+}
+
+// Navigation functions
+function backToHome() {
+    document.getElementById('landingPage').style.display = 'flex';
+    document.getElementById('gameArea').style.display = 'none';
+    document.getElementById('instructionsPage').style.display = 'none';
+}
+
+function showInstructions() {
+    document.getElementById('landingPage').style.display = 'none';
+    document.getElementById('gameArea').style.display = 'none';
+    document.getElementById('instructionsPage').style.display = 'flex';
+}
+
+function showGame() {
+    document.getElementById('landingPage').style.display = 'none';
+    document.getElementById('instructionsPage').style.display = 'none';
+    document.getElementById('gameArea').style.display = 'flex';
+}
+
+window.addEventListener('DOMContentLoaded', drawLandingDominoes);
+
+// ========================================
+// GAME LOGIC
+// ========================================
+
 const pipPositions = [
-    [], // 0
-    [[0.5, 0.5]], // 1
-    [[0.25, 0.25], [0.75, 0.75]], // 2
-    [[0.25, 0.25], [0.5, 0.5], [0.75, 0.75]], // 3
-    [[0.25, 0.25], [0.25, 0.75], [0.75, 0.25], [0.75, 0.75]], // 4
-    [[0.25, 0.25], [0.25, 0.75], [0.5, 0.5], [0.75, 0.25], [0.75, 0.75]], // 5
-    [[0.25, 0.25], [0.25, 0.5], [0.25, 0.75], [0.75, 0.25], [0.75, 0.5], [0.75, 0.75]] // 6
+    [],
+    [[0.5, 0.5]],
+    [[0.25, 0.25], [0.75, 0.75]],
+    [[0.25, 0.25], [0.5, 0.5], [0.75, 0.75]],
+    [[0.25, 0.25], [0.25, 0.75], [0.75, 0.25], [0.75, 0.75]],
+    [[0.25, 0.25], [0.25, 0.75], [0.5, 0.5], [0.75, 0.25], [0.75, 0.75]],
+    [[0.25, 0.25], [0.25, 0.5], [0.25, 0.75], [0.75, 0.25], [0.75, 0.5], [0.75, 0.75]]
 ];
 
-// Colors for pips (1 to 6, 0 has none)
 const pipColors = [null, 'red', '#ff9900', 'yellow', 'green', 'blue', 'purple'];
 
-// Function to draw a single domino on a canvas context
 function drawDomino(ctx, x, y, val1, val2, w, h) {
     ctx.fillStyle = 'white';
     ctx.fillRect(x, y, w, h);
     ctx.strokeStyle = 'black';
     ctx.strokeRect(x, y, w, h);
-    // Draw middle line
     ctx.beginPath();
     ctx.moveTo(x + w / 2, y);
     ctx.lineTo(x + w / 2, y + h);
     ctx.stroke();
-    // Draw pips for left and right halves
     drawPips(ctx, x, y, w / 2, h, val1, pipColors[val1]);
     drawPips(ctx, x + w / 2, y, w / 2, h, val2, pipColors[val2]);
 }
 
-// Function to draw a blank domino (no pips or middle line)
 function drawBlankDomino(ctx, x, y, w, h) {
     ctx.fillStyle = 'white';
     ctx.fillRect(x, y, w, h);
@@ -36,7 +140,6 @@ function drawBlankDomino(ctx, x, y, w, h) {
     ctx.strokeRect(x, y, w, h);
 }
 
-// Helper to draw pips on a half-domino
 function drawPips(ctx, x, y, w, h, val, color) {
     if (val === 0) return;
     ctx.fillStyle = color;
@@ -50,7 +153,6 @@ function drawPips(ctx, x, y, w, h, val, color) {
     });
 }
 
-// Class for random utilities, like shuffling
 class CRandom {
     static shuffle(array) {
         for (let i = array.length - 1; i > 0; i--) {
@@ -61,7 +163,6 @@ class CRandom {
     }
 }
 
-// Class to manage the set of domino pieces
 class CDominoes {
     constructor() {
         this.pieces = [];
@@ -78,7 +179,6 @@ class CDominoes {
     }
 }
 
-// Class to manage the table (chain of played dominoes)
 class CTable {
     constructor() {
         this.chain = [];
@@ -86,7 +186,6 @@ class CTable {
         this.ctx = this.canvas.getContext('2d');
     }
 
-    // Place a tile on head or tail
     place(tile, position) {
         if (this.chain.length === 0) {
             this.chain.push(tile);
@@ -110,13 +209,12 @@ class CTable {
         return this.chain.map(t => `[${t[0]}|${t[1]}]`).join('');
     }
 
-    // Render the chain on canvas, expanding width if needed
     render() {
         const dominoW = 80;
         const dominoH = 40;
         const spacing = 5;
         let x = 10;
-        let y = 10;
+        let y = 20;
         const requiredWidth = 20 + this.chain.length * (dominoW + spacing);
         if (requiredWidth > this.canvas.width) {
             this.canvas.width = requiredWidth;
@@ -129,7 +227,6 @@ class CTable {
     }
 }
 
-// Class for players
 class CPlayer {
     constructor(name, divId, isHuman) {
         this.name = name;
@@ -138,7 +235,6 @@ class CPlayer {
         this.isHuman = isHuman;
     }
 
-    // Render hand as clickable canvases
     renderHand() {
         this.div.innerHTML = '';
         this.hand.forEach((tile, idx) => {
@@ -148,8 +244,6 @@ class CPlayer {
             const ctx = canv.getContext('2d');
             drawDomino(ctx, 0, 0, tile[0], tile[1], 80, 40);
             const div = document.createElement('div');
-            div.style.display = 'inline-block';
-            div.style.margin = '5px';
             div.appendChild(canv);
             div.tile = tile;
             div.idx = idx;
@@ -158,7 +252,6 @@ class CPlayer {
         updateHandCount(this);
     }
 
-    // Render blank hand for non-active player
     renderBlankHand(count) {
         this.div.innerHTML = '';
         for (let i = 0; i < count; i++) {
@@ -168,18 +261,14 @@ class CPlayer {
             const ctx = canv.getContext('2d');
             drawBlankDomino(ctx, 0, 0, 80, 40);
             const div = document.createElement('div');
-            div.style.display = 'inline-block';
-            div.style.margin = '5px';
             div.appendChild(canv);
             this.div.appendChild(div);
         }
         updateHandCount(this);
     }
 
-    // AI turn logic (computer player)
     playAITurn(head, tail, boneyard) {
         if (head === null && tail === null) {
-            // First turn: pick random tile
             const index = Math.floor(Math.random() * this.hand.length);
             let tile = this.hand.splice(index, 1)[0];
             if (tile[0] > tile[1]) {
@@ -188,10 +277,8 @@ class CPlayer {
             logMove(`${this.name} starts with [${tile[0]}|${tile[1]}]`);
             return {tile, position: 'start', newHead: tile[0], newTail: tile[1]};
         }
-        // Find playable tiles
         const playableTiles = this.hand.filter(t => t[0] === head || t[1] === head || t[0] === tail || t[1] === tail);
         if (playableTiles.length > 0) {
-            // Play the first playable (simple AI)
             const tile = playableTiles[0];
             const index = this.hand.indexOf(tile);
             this.hand.splice(index, 1);
@@ -211,7 +298,6 @@ class CPlayer {
             logMove(`${this.name} plays [${orientedTile[0]}|${orientedTile[1]}] on ${position}`);
             return {tile: orientedTile, position, newHead, newTail};
         } else {
-            // Draw until playable or boneyard empty
             while (boneyard.pieces.length > 0) {
                 const drawn = boneyard.pieces.shift();
                 this.hand.push(drawn);
@@ -241,13 +327,11 @@ class CPlayer {
         }
     }
 
-    // Calculate total pips in hand
     getTotalPips() {
         return this.hand.reduce((sum, tile) => sum + tile[0] + tile[1], 0);
     }
 }
 
-// Global game variables
 let dominoes, boneyard, player1, player2, players, current, table, head, tail, isVsComp;
 let player1Score = 0;
 let player2Score = 0;
@@ -255,7 +339,6 @@ let lastTurnWasPass = false;
 let scoringType = 'wins';
 let targetScore = 100;
 
-// Function to log moves to console and game log div
 function logMove(message) {
     console.log(message);
     const logContent = document.getElementById('logContent');
@@ -263,31 +346,27 @@ function logMove(message) {
     logContent.scrollTop = logContent.scrollHeight;
 }
 
-// Update hand count display
 function updateHandCount(player) {
     const countSpan = document.getElementById(player.name === "Player 1" ? "player1Count" : "player2Count");
-    countSpan.textContent = `(${player.hand.length} pieces)`;
+    countSpan.textContent = `(${player.hand.length} tiles)`;
 }
 
-// Initialize game based on mode
 function initGame(p1Human, p2Human) {
-    console.log("initGame called with p1Human:", p1Human, "p2Human:", p2Human); // Debug log
     isVsComp = !p2Human;
     dominoes = new CDominoes();
     boneyard = dominoes;
     player1 = new CPlayer("Player 1", "player1Hand", p1Human);
     player2 = new CPlayer(isVsComp ? "Computer" : "Player 2", "player2Hand", p2Human);
-    // Reset scores when switching mode
     player1Score = 0;
     player2Score = 0;
-    // Deal tiles
+    
     for (let i = 0; i < 10; i++) {
         player1.hand.push(boneyard.pieces.shift());
     }
     for (let i = 0; i < 10; i++) {
         player2.hand.push(boneyard.pieces.shift());
     }
-    // Sort hands initially
+    
     player1.hand.sort((a, b) => (a[0] !== b[0] ? a[0] - b[0] : a[1] - b[1]));
     player2.hand.sort((a, b) => (a[0] !== b[0] ? a[0] - b[0] : a[1] - b[1]));
     player1.renderHand();
@@ -303,40 +382,34 @@ function initGame(p1Human, p2Human) {
     updateBoneyardCount();
     toggleHands();
     nextTurn();
-    document.getElementById('modeSelection').style.display = 'none'; // Hide mode selection after starting
-    document.getElementById('instructions').style.display = 'block';
-    document.getElementById('gameArea').style.display = 'block';
     document.getElementById('newGameBtn').style.display = 'none';
-    document.getElementById('scoreboard').style.display = 'block';
-    updateScoreboard(); // Moved here after players are created
-    console.log("Game initialized, modeSelection hidden, gameArea shown"); // Debug log
+    updateScoreboard();
+    showGame();
 }
 
-// Toggle hand visibility: show current player's hand, show other with blank tiles
 function toggleHands() {
     const player = players[current];
     const other = players[1 - current];
     if (player.isHuman) {
-        player.renderHand(); // Show active player's hand with tiles
+        player.renderHand();
     } else {
-        player.renderBlankHand(player.hand.length); // Show blank tiles for active computer
+        player.renderBlankHand(player.hand.length);
     }
     if (isVsComp && !other.isHuman) {
-        other.renderBlankHand(other.hand.length); // Show blank tiles for computer in vs mode
+        other.renderBlankHand(other.hand.length);
     } else if (!other.isHuman) {
-        other.renderBlankHand(other.hand.length); // Show blank tiles for non-active computer
+        other.renderBlankHand(other.hand.length);
     } else {
-        other.renderBlankHand(other.hand.length); // Show blank tiles for non-active human
+        other.renderBlankHand(other.hand.length);
     }
     updateHandCount(player);
     updateHandCount(other);
 }
 
-// Proceed to next turn
 function nextTurn() {
     toggleHands();
     const player = players[current];
-    updateTurnInfo(`${player.name}'s turn. Head: ${head ?? '-'} Tail: ${tail ?? '-'}`);
+    updateTurnInfo(`${player.name}'s turn`);
     if (player.isHuman) {
         setupHumanTurn(player);
     } else {
@@ -344,7 +417,6 @@ function nextTurn() {
     }
 }
 
-// Computer turn handler
 function doCompTurn(player) {
     const result = player.playAITurn(head, tail, boneyard);
     if (result.tile) {
@@ -372,7 +444,6 @@ function doCompTurn(player) {
     nextTurn();
 }
 
-// Setup for human player's turn
 function setupHumanTurn(player) {
     clearHighlights(player);
     document.getElementById('drawButton').style.display = 'none';
@@ -387,7 +458,8 @@ function setupHumanTurn(player) {
         const handDivs = Array.from(player.div.children);
         playableIndices.forEach(idx => {
             const d = handDivs[idx];
-            d.style.border = '2px solid red';
+            d.style.border = '3px solid #ff4444';
+            d.style.borderRadius = '4px';
             d.style.cursor = 'pointer';
             d.onclick = () => handleTileClick(player, d, player.hand[idx], idx);
         });
@@ -396,7 +468,6 @@ function setupHumanTurn(player) {
     }
 }
 
-// Handle drawing from boneyard for human
 function handleDraw() {
     const player = players[current];
     let foundPlayable = false;
@@ -412,7 +483,8 @@ function handleDraw() {
             clearHighlights(player);
             const handDivs = Array.from(player.div.children);
             const d = handDivs[idx];
-            d.style.border = '2px solid red';
+            d.style.border = '3px solid #ff4444';
+            d.style.borderRadius = '4px';
             d.style.cursor = 'pointer';
             d.onclick = () => handleTileClick(player, d, tile, idx);
             foundPlayable = true;
@@ -432,7 +504,6 @@ function handleDraw() {
     }
 }
 
-// Handle clicking a tile
 function handleTileClick(player, div, tile, idx) {
     clearHighlights(player);
     let possiblePositions = [];
@@ -445,16 +516,21 @@ function handleTileClick(player, div, tile, idx) {
     if (possiblePositions.length === 1) {
         placeTile(player, tile, idx, possiblePositions[0]);
     } else if (possiblePositions.length === 2) {
-        // Prompt choice for position
         const choiceDiv = document.createElement('div');
-        choiceDiv.style.position = 'absolute';
+        choiceDiv.style.position = 'fixed';
         choiceDiv.style.top = '50%';
         choiceDiv.style.left = '50%';
         choiceDiv.style.transform = 'translate(-50%, -50%)';
         choiceDiv.style.background = 'white';
-        choiceDiv.style.padding = '10px';
-        choiceDiv.style.border = '1px solid black';
-        choiceDiv.innerHTML = `<button id="headBtn">Place on Head</button><button id="tailBtn">Place on Tail</button>`;
+        choiceDiv.style.padding = '20px';
+        choiceDiv.style.borderRadius = '12px';
+        choiceDiv.style.boxShadow = '0 4px 20px rgba(0,0,0,0.2)';
+        choiceDiv.style.zIndex = '1000';
+        choiceDiv.innerHTML = `
+            <p style="margin-bottom: 15px; font-weight: 600; color: #1a1a1a;">Choose placement:</p>
+            <button id="headBtn" style="margin-right: 10px; padding: 10px 20px; background: #1a1a1a; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">Head</button>
+            <button id="tailBtn" style="padding: 10px 20px; background: #1a1a1a; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">Tail</button>
+        `;
         document.body.appendChild(choiceDiv);
         document.getElementById('headBtn').onclick = () => {
             placeTile(player, tile, idx, 'head');
@@ -467,7 +543,6 @@ function handleTileClick(player, div, tile, idx) {
     }
 }
 
-// Place the selected tile
 function placeTile(player, tile, idx, pos) {
     let oriented = tile;
     let newHead = head;
@@ -506,37 +581,33 @@ function placeTile(player, tile, idx, pos) {
     nextTurn();
 }
 
-// Clear highlights on hand
 function clearHighlights(player) {
     const handDivs = Array.from(player.div.children);
     handDivs.forEach(d => {
         d.style.border = '';
+        d.style.borderRadius = '';
         d.style.cursor = '';
         d.onclick = null;
     });
 }
 
-// Update turn info text
 function updateTurnInfo(text) {
     document.getElementById('turnInfo').textContent = text;
 }
 
-// Update boneyard count display
 function updateBoneyardCount() {
-    document.getElementById('boneyardCount').textContent = `Boneyard: ${boneyard.pieces.length} pieces left`;
+    document.getElementById('boneyardCount').textContent = `Boneyard: ${boneyard.pieces.length} pieces`;
 }
 
-// Update scoreboard display
 function updateScoreboard() {
     const target = parseInt(document.getElementById('targetScore').value) || targetScore;
     if (scoringType === 'wins') {
-        document.getElementById('scoreText').textContent = `${player1.name}: ${player1Score} wins - ${player2.name}: ${player2Score} wins (Target: ${target} wins)`;
+        document.getElementById('scoreText').textContent = `${player1.name}: ${player1Score} - ${player2.name}: ${player2Score} (Target: ${target})`;
     } else {
-        document.getElementById('scoreText').textContent = `${player1.name}: ${player1Score} points - ${player2.name}: ${player2Score} points (Target: ${target} points)`;
+        document.getElementById('scoreText').textContent = `${player1.name}: ${player1Score} pts - ${player2.name}: ${player2Score} pts (Target: ${target})`;
     }
 }
 
-// Handle game win
 function gameWin(winner) {
     const loser = players[1 - current];
     let score = loser.getTotalPips();
@@ -562,7 +633,6 @@ function gameWin(winner) {
     endGame();
 }
 
-// Handle game end due to consecutive passes
 function gameEnd() {
     const player1Pips = player1.getTotalPips();
     const player2Pips = player2.getTotalPips();
@@ -586,10 +656,10 @@ function gameEnd() {
         logMove("\nGame ended in a draw!");
     }
     if (winner) {
-        alert(`${winner.name} wins the round with ${winner === player1 ? player2Pips : player1Pips} points from ${winner === player1 ? player2.name : player1.name}!`);
-        logMove(`\n${winner.name} wins the round with ${winner === player1 ? player2Pips : player1Pips} points from ${winner === player1 ? player2.name : player1.name}!`);
-        logMove(`${player1.name} has ${player1Pips} pips left: ${player1.hand.map(t => `[${t[0]}|${t[1]}]`).join(', ')}`);
-        logMove(`${player2.name} has ${player2Pips} pips left: ${player2.hand.map(t => `[${t[0]}|${t[1]}]`).join(', ')}`);
+        alert(`${winner.name} wins the round!`);
+        logMove(`\n${winner.name} wins the round!`);
+        logMove(`${player1.name} has ${player1Pips} pips left`);
+        logMove(`${player2.name} has ${player2Pips} pips left`);
         logMove(`Final table: ${table.toASCII()}`);
     }
     updateScoreboard();
@@ -597,54 +667,82 @@ function gameEnd() {
     endGame();
 }
 
-// Check if game is won based on target score
 function checkGameWin() {
     const target = parseInt(document.getElementById('targetScore').value) || targetScore;
     if ((scoringType === 'wins' && (player1Score >= target || player2Score >= target)) ||
         (scoringType === 'points' && (player1Score >= target || player2Score >= target))) {
         const winner = player1Score > player2Score ? player1.name : player2.name;
         alert(`${winner} wins the game with a score of ${Math.max(player1Score, player2Score)}!`);
-        logMove(`\n${winner} wins the game with a score of ${Math.max(player1Score, player2Score)}!`);
+        logMove(`\n${winner} wins the game!`);
     }
 }
 
-// Common function to end the round
 function endGame() {
     document.getElementById('drawButton').style.display = 'none';
     document.getElementById('newGameBtn').style.display = 'block';
 }
 
-// Setup mode buttons
+// ========================================
+// EVENT LISTENERS
+// ========================================
+
 document.addEventListener('DOMContentLoaded', () => {
-    console.log("DOM fully loaded, attaching event listeners"); // Debug log
+    // Landing page buttons
     document.getElementById('twoPlayerBtn').onclick = () => {
-        console.log("2 Players button clicked"); // Debug log
         initGame(true, true);
     };
 
     document.getElementById('vsCompBtn').onclick = () => {
-        console.log("Player vs Computer button clicked"); // Debug log
         initGame(true, false);
     };
 
-    document.getElementById('drawButton').onclick = handleDraw;
-    document.getElementById('newGameBtn').onclick = () => {
-        console.log("New Game button clicked"); // Debug log
-        document.getElementById('gameArea').style.display = 'none';
-        document.getElementById('instructions').style.display = 'none';
-        document.getElementById('logContent').textContent = '';
-        document.getElementById('newGameBtn').style.display = 'none';
-        document.getElementById('modeSelection').style.display = 'block'; // Show mode selection for new game
+    document.getElementById('howToPlayLandingBtn').onclick = () => {
+        showInstructions();
     };
+
+    // Game buttons
+    document.getElementById('drawButton').onclick = handleDraw;
+    
+    document.getElementById('newGameBtn').onclick = () => {
+        document.getElementById('logContent').textContent = '';
+        backToHome();
+    };
+
+    // Settings toggle
+    document.getElementById('settingsBtn').onclick = () => {
+        const panel = document.getElementById('settingsPanel');
+        panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+    };
+
+    // How to Play button in game
+    document.getElementById('howToPlayBtn').onclick = () => {
+        showInstructions();
+    };
+
+    // Game log toggle
+    document.getElementById('logToggle').onclick = () => {
+        const log = document.getElementById('gameLog');
+        const toggle = document.getElementById('logToggle');
+        if (log.style.display === 'none') {
+            log.style.display = 'block';
+            toggle.classList.add('active');
+        } else {
+            log.style.display = 'none';
+            toggle.classList.remove('active');
+        }
+    };
+    
     document.getElementById('resetScores').onclick = () => {
         player1Score = 0;
         player2Score = 0;
         updateScoreboard();
     };
+    
     document.getElementById('scoringType').onchange = (e) => {
         scoringType = e.target.value;
         updateScoreboard();
     };
+    
     document.getElementById('targetScore').onchange = (e) => {
         targetScore = parseInt(e.target.value) || 100;
         updateScoreboard();
