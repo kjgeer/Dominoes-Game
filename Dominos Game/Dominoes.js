@@ -1,3 +1,13 @@
+// Remove highlights and click handlers from all tiles in the player's hand
+function clearHighlights(player) {
+    const handDivs = Array.from(player.div.children);
+    handDivs.forEach(d => {
+        d.style.border = '';
+        d.style.borderRadius = '';
+        d.style.cursor = '';
+        d.onclick = null;
+    });
+}
 // ========================================
 // LANDING PAGE DOMINOES
 // ========================================
@@ -102,7 +112,6 @@ function showGame() {
     document.getElementById('gameArea').style.display = 'flex';
 }
 
-window.addEventListener('DOMContentLoaded', drawLandingDominoes);
 
 // ========================================
 // GAME LOGIC
@@ -194,6 +203,7 @@ class CTable {
         } else if (position === 'tail') {
             this.chain.push(tile);
         }
+        this.lastPlacement = position;
         this.render();
     }
 
@@ -213,9 +223,13 @@ class CTable {
         const dominoW = 80;
         const dominoH = 40;
         const spacing = 5;
-        let x = 10;
         let y = 20;
-        const requiredWidth = 20 + this.chain.length * (dominoW + spacing);
+        // Center the chain in the canvas
+        const chainLen = this.chain.length;
+        const totalWidth = chainLen * (dominoW + spacing) - spacing;
+        let x = Math.max((this.canvas.width - totalWidth) / 2, 0);
+        // Expand canvas if needed
+        const requiredWidth = Math.max(this.canvas.width, totalWidth + 40);
         if (requiredWidth > this.canvas.width) {
             this.canvas.width = requiredWidth;
         }
@@ -224,6 +238,17 @@ class CTable {
             drawDomino(this.ctx, x, y, tile[0], tile[1], dominoW, dominoH);
             x += dominoW + spacing;
         });
+        // Auto-scroll play area to the correct end
+        const playArea = document.getElementById('tableArea');
+        if (playArea) {
+            if (this.lastPlacement === 'head') {
+                // Scroll to the leftmost tile
+                playArea.scrollLeft = 0;
+            } else {
+                // Scroll to the rightmost tile
+                playArea.scrollLeft = playArea.scrollWidth;
+            }
+        }
     }
 }
 
@@ -413,7 +438,7 @@ function nextTurn() {
     if (player.isHuman) {
         setupHumanTurn(player);
     } else {
-        doCompTurn(player);
+        setTimeout(() => doCompTurn(player), 700);
     }
 }
 
@@ -545,50 +570,38 @@ function handleTileClick(player, div, tile, idx) {
 
 function placeTile(player, tile, idx, pos) {
     let oriented = tile;
-    let newHead = head;
-    let newTail = tail;
+    // Safeguard: Only allow play on valid end, and update head/tail correctly
     if (pos === 'head') {
-        if (tile[0] === head) {
+        if (tile[1] === head) {
             oriented = [tile[1], tile[0]];
-            newHead = tile[1];
         } else {
             oriented = [tile[0], tile[1]];
-            newHead = tile[0];
         }
     } else {
         if (pos === 'start') pos = 'tail';
         if (tile[0] === tail) {
             oriented = [tile[0], tile[1]];
-            newTail = tile[1];
         } else {
             oriented = [tile[1], tile[0]];
-            newTail = tile[0];
         }
     }
     player.hand.splice(idx, 1);
     table.place(oriented, pos);
-    head = newHead;
-    tail = newTail;
+    // Always update head and tail after placing
+    head = table.getHead();
+    tail = table.getTail();
+    lastTurnWasPass = false;
     player.renderHand();
+    updateBoneyardCount();
     logMove(`${player.name} plays [${oriented[0]}|${oriented[1]}] on ${pos}`);
     logMove(`Table after turn: ${table.toASCII()}`);
     if (player.hand.length === 0) {
         gameWin(player);
         return;
     }
-    lastTurnWasPass = false;
     current = 1 - current;
     nextTurn();
-}
-
-function clearHighlights(player) {
-    const handDivs = Array.from(player.div.children);
-    handDivs.forEach(d => {
-        d.style.border = '';
-        d.style.borderRadius = '';
-        d.style.cursor = '';
-        d.onclick = null;
-    });
+        // ...existing code...
 }
 
 function updateTurnInfo(text) {
@@ -605,6 +618,14 @@ function updateScoreboard() {
         document.getElementById('scoreText').textContent = `${player1.name}: ${player1Score} - ${player2.name}: ${player2Score} (Target: ${target})`;
     } else {
         document.getElementById('scoreText').textContent = `${player1.name}: ${player1Score} pts - ${player2.name}: ${player2Score} pts (Target: ${target})`;
+    }
+}
+
+// Add a function to clear the table
+function clearTable() {
+    if (table && table.chain) {
+        table.chain = [];
+        table.render();
     }
 }
 
@@ -680,6 +701,7 @@ function checkGameWin() {
 function endGame() {
     document.getElementById('drawButton').style.display = 'none';
     document.getElementById('newGameBtn').style.display = 'block';
+    document.getElementById('continueGameBtn').style.display = 'block';
 }
 
 // ========================================
@@ -705,7 +727,14 @@ document.addEventListener('DOMContentLoaded', () => {
     
     document.getElementById('newGameBtn').onclick = () => {
         document.getElementById('logContent').textContent = '';
+        clearTable();
         backToHome();
+    };
+    document.getElementById('continueGameBtn').onclick = () => {
+        clearTable();
+        document.getElementById('newGameBtn').style.display = 'none';
+        document.getElementById('continueGameBtn').style.display = 'none';
+        initGame(player1.isHuman, player2.isHuman);
     };
 
     // Settings toggle
