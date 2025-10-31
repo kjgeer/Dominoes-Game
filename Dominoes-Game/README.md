@@ -1,4 +1,4 @@
-# Dominoes Game 
+# Dominoes Game
 
 ## Table of Contents
 
@@ -7,19 +7,17 @@
 - [Demo](#demo)
 - [Quick Start](#quick-start)
 - [Game Rules](#game-rules)
-- [Architecture](#architecture)
 - [Development](#development)
 - [Deployment](#deployment)
-- [DevOps Pipeline](#devops-pipeline)
 - [Project Structure](#project-structure)
 - [Contributing](#contributing)
-- [License](#license)
 
 ---
 
 ## Overview
 
-This project is a **full stack dominoes game** with a complete production ready DevOps infrastructure. 
+This project is a **browser-based dominoes game** built with vanilla JavaScript, HTML, and CSS. It features both human vs human and human vs AI gameplay modes with a complete deployment infrastructure using Docker and AWS S3.
+
 ---
 
 ## Features
@@ -31,46 +29,55 @@ This project is a **full stack dominoes game** with a complete production ready 
   - Player vs Computer (AI)
 - **Score Tracking:** Points or wins based scoring
 - **Responsive Design:** Works on desktop, tablet, and mobile
-- **Visual Feedback:** 
+- **Visual Feedback:**
   - Color-coded domino pips
   - Red highlighting for playable tiles
   - Smooth animations
 - **Game Log:** Track all moves and game events
 - **Customizable Settings:** Adjust target score and scoring type
+- **Console Version:** Node.js implementation with multi-threaded AI players
+
+### Infrastructure Features
+
+- **Docker Support:** Containerized deployment with health checks
+- **AWS S3 Deployment:** Static website hosting on AWS
+- **Custom Error Pages:** Professional 404 error handling
+- **Terraform IaC:** Automated infrastructure provisioning
 
 ---
 
-##  Demo
+## Demo
 
 ### Game Screenshots
 
 **Landing Page:**
 ```
-
+Clean, modern interface with game mode selection
 ```
 
 **Game Board:**
 ```
-
+Interactive domino tiles with visual feedback
+Real-time score tracking and game log
 ```
 
 ---
 
-##  Quick Start
+## Quick Start
 
 ### Prerequisites
 
 - **For Local Play:** Modern web browser (Chrome, Firefox, Safari, Edge)
 - **For Docker:** Docker Desktop installed
-- **For Kubernetes:** kubectl, helm, and a K8s cluster
 - **For AWS Deployment:** AWS CLI, Terraform, and AWS account
+- **For Console Version:** Node.js (v14 or higher)
 
 ### Option 1: Play Locally (Simplest)
 
 ```bash
 # Clone the repository
 git clone https://github.com/ArsalanAnwer0/Dominoes-Game.git
-cd Dominoes-Game
+cd Dominoes-Game/Dominoes-Game
 
 # Open in browser
 open Dominoes.html
@@ -85,27 +92,29 @@ docker-compose up
 
 # Or build manually
 docker build -t dominoes-game .
-docker run -p 8080:80 dominoes-game
+docker run -p 8081:8080 dominoes-game
 
 # Open browser
-open http://localhost:8080
+open http://localhost:8081
 ```
 
-### Option 3: Deploy to Kubernetes
+### Option 3: Console Version
 
 ```bash
-# Using Helm
-helm install dominoes-game ./helm/dominoes-game
+# Navigate to console version
+cd console-version
 
-# Get the service URL
-kubectl get svc dominoes-game
+# Install dependencies
+npm install
 
-# Port forward to access
-kubectl port-forward svc/dominoes-game 8080:80
-open http://localhost:8080
+# Run the game
+node dominoes-game.js
+
+# Run tests
+node test-game.js
 ```
 
-### Option 4: Full AWS Deployment
+### Option 4: AWS S3 Deployment
 
 See [Deployment Guide](#deployment) below.
 
@@ -121,11 +130,11 @@ See [Deployment Guide](#deployment) below.
 ### How to Play
 
 1. **Starting:** Random player begins by playing any tile
-2. **Playing:** 
+2. **Playing:**
    - Match one half of your tile to the chain's head (left) or tail (right)
    - Click on highlighted red tiles to play
    - Choose placement if both ends match
-3. **Drawing:** 
+3. **Drawing:**
    - Click "Draw from Boneyard" if you can't play
    - Draw until you get a playable tile or boneyard is empty
    - Pass if boneyard is empty and no playable tile
@@ -153,22 +162,14 @@ See [Deployment Guide](#deployment) below.
 
 ---
 
-## Project Infrastructure
-
-
-![App Screenshot](./Architecture.png)
-
-
----
-
-##  Development
+## Development
 
 ### Local Development Setup
 
 ```bash
 # Clone repository
 git clone https://github.com/ArsalanAnwer0/Dominoes-Game.git
-cd Dominoes-Game
+cd Dominoes-Game/Dominoes-Game
 
 # Open in your favorite editor
 code .
@@ -228,6 +229,28 @@ open Dominoes.html
 - AI opponent implementation
 - Event handling and DOM manipulation
 
+**`error.html`**
+- Custom 404 error page
+- Professional error handling UI
+- Navigation back to game
+
+### Console Version
+
+The `console-version/` directory contains a Node.js implementation:
+
+**`dominoes-game.js`**
+- Core game engine
+- Multi-threaded AI players using Worker threads
+- Command-line interface
+
+**`player-worker.js`**
+- AI player logic in separate thread
+- Concurrent move calculation
+
+**`test-game.js`**
+- Automated testing suite
+- Game simulation and validation
+
 ---
 
 ## Deployment
@@ -241,181 +264,100 @@ docker build -t dominoes-game:v1.0.0 .
 
 **Run Container:**
 ```bash
-docker run -d -p 8080:80 --name dominoes dominoes-game:v1.0.0
+docker run -d -p 8081:8080 --name dominoes dominoes-game:v1.0.0
 ```
 
-**Push to Registry:**
+**Using Docker Compose:**
 ```bash
-# Tag for AWS ECR
-docker tag dominoes-game:v1.0.0 \
-  123456789012.dkr.ecr.us-east-1.amazonaws.com/dominoes-game:v1.0.0
-
-# Login to ECR
-aws ecr get-login-password --region us-east-1 | \
-  docker login --username AWS --password-stdin \
-  123456789012.dkr.ecr.us-east-1.amazonaws.com
-
-# Push
-docker push 123456789012.dkr.ecr.us-east-1.amazonaws.com/dominoes-game:v1.0.0
-```
-
-### Kubernetes Deployment
-
-**Using Helm (Recommended):**
-```bash
-# Install
-helm install dominoes-game ./helm/dominoes-game
-
-# Upgrade
-helm upgrade dominoes-game ./helm/dominoes-game
-
-# With custom values
-helm install dominoes-game ./helm/dominoes-game \
-  -f helm/dominoes-game/values-prod.yaml
-
-# Uninstall
-helm uninstall dominoes-game
-```
-
-**Check Deployment:**
-```bash
-# View pods
-kubectl get pods -l app.kubernetes.io/name=dominoes-game
-
-# View service
-kubectl get svc dominoes-game
-
-# View ingress
-kubectl get ingress dominoes-game
+# Start
+docker-compose up -d
 
 # View logs
-kubectl logs -l app.kubernetes.io/name=dominoes-game --tail=100 -f
+docker-compose logs -f
+
+# Stop
+docker-compose down
 ```
 
-### AWS Full Stack Deployment
+**Docker Features:**
+- Nginx web server
+- Health check endpoint
+- Automatic restart policy
+- Port mapping: 8081 (host) → 8080 (container)
 
-**Step 1: Fork Repository**
-```bash
-# Fork on GitHub, then clone
-git clone https://github.com/YOUR_USERNAME/Dominoes-Game.git
-cd Dominoes-Game
-```
+### AWS S3 Static Website Deployment
 
-**Step 2: Configure AWS**
+**Prerequisites:**
 ```bash
-# Configure AWS CLI
+# Configure AWS credentials
 aws configure
 
-# Create ECR repository
-aws ecr create-repository --repository-name dominoes-game --region us-east-1
+# Or set environment variables
+export AWS_ACCESS_KEY_ID="your-access-key"
+export AWS_SECRET_ACCESS_KEY="your-secret-key"
+export AWS_DEFAULT_REGION="us-east-1"
 ```
 
-**Step 3: Set GitHub Secrets**
+**Deployment Steps:**
 
-Go to **Settings → Secrets → Actions** and add:
-- `AWS_ACCESS_KEY_ID`
-- `AWS_SECRET_ACCESS_KEY`
-- (Optional) `AWS_REGION` (default: us-east-1)
-- (Optional) `ECR_REPOSITORY_NAME` (default: dominoes-game)
-
-**Step 4: Deploy Infrastructure with Terraform**
 ```bash
-cd terraform/environments/dev
+# Navigate to terraform directory
+cd terraform
 
-# Initialize
+# Initialize Terraform
 terraform init
 
-# Plan
+# Review deployment plan
 terraform plan
 
-# Apply
+# Deploy to AWS
 terraform apply
 
-# Get kubectl config
-aws eks update-kubeconfig --name dominoes-game-dev-cluster --region us-east-1
+# Get website URL
+terraform output website_endpoint
 ```
 
-**Step 5: Install ArgoCD**
+**Customization:**
+
+Create a `terraform.tfvars` file:
+```hcl
+bucket_name  = "my-dominoes-game"
+aws_region   = "us-east-1"
+environment  = "prod"
+```
+
+Or use command-line variables:
 ```bash
-# Create namespace
-kubectl create namespace argocd
-
-# Install ArgoCD
-kubectl apply -n argocd -f \
-  https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
-
-# Get admin password
-kubectl -n argocd get secret argocd-initial-admin-secret \
-  -o jsonpath="{.data.password}" | base64 -d
-
-# Port forward
-kubectl port-forward svc/argocd-server -n argocd 8080:443
-
-# Open browser: https://localhost:8080
+terraform apply -var="bucket_name=my-dominoes-game" -var="environment=prod"
 ```
 
-**Step 6: Deploy Application with ArgoCD**
+**Updating the Website:**
 ```bash
-# Apply ArgoCD application
-kubectl apply -f argocd/applications/dominoes-game.yaml
-
-# Check sync status
-kubectl get application -n argocd
+# Make changes to game files
+# Then reapply Terraform
+terraform apply
+# Terraform will detect file changes via MD5 hash and update only modified files
 ```
 
-**Step 7: Push to Trigger CI/CD**
+**Destroying Resources:**
 ```bash
-git add .
-git commit -m "feat: initial deployment"
-git push origin main
-
-# GitHub Actions will:
-# 1. Build Docker image
-# 2. Push to ECR
-# 3. Update Helm values
-# 4. ArgoCD will auto-deploy
+terraform destroy
 ```
 
----
+**Cost Estimate:**
+- Storage: ~$0.023 per GB per month
+- Data transfer: First 1GB free, then $0.09 per GB
+- Requests: $0.0004 per 1,000 GET requests
+- Expected: Under $1/month for moderate traffic
 
-## DevOps Pipeline
+**Automated Deployment:**
 
-### CI/CD Workflow
-
-**Trigger:** Push to `main` or `feature/*` branches
-
-**Jobs:**
-
-1. **build-and-push**
-   - Checkout code
-   - Authenticate with AWS
-   - Build Docker image
-   - Tag with commit SHA (first 8 chars)
-   - Push to AWS ECR with `:latest` and `:SHA` tags
-
-2. **update-helm-values** (main branch only)
-   - Update `helm/dominoes-game/values-prod.yaml`
-   - Set new image tag
-   - Commit changes to Git
-   - Triggers ArgoCD sync
-
-3. **ArgoCD Auto-Sync**
-   - Detects Git changes
-   - Pulls new Helm values
-   - Deploys to Kubernetes
-   - Performs rolling update (zero downtime)
-
-### Infrastructure as Code
-
-**Terraform Modules:**
-- **VPC Module:** Network infrastructure with public/private subnets
-- **EKS Module:** Kubernetes cluster with managed node groups
-- **ECR Module:** Container registry with lifecycle policies
-- **ArgoCD Module:** GitOps deployment tool
-
-**Environments:**
-- **Dev:** 2 nodes, t3.medium, us-east-1a/b
-- **Prod:** 3 nodes, t3.large, us-east-1a/b/c
+Use the provided deployment script:
+```bash
+cd terraform
+chmod +x deploy.sh
+./deploy.sh
+```
 
 ---
 
@@ -425,63 +367,160 @@ git push origin main
 Dominoes-Game/
 │
 ├── Dominoes.html                 # Main game HTML
-├── Dominoes.css                  # Styling
-├── Dominoes.js                   # Game logic
+├── Dominoes.css                  # Game styling
+├── Dominoes.js                   # Game logic and AI
+├── error.html                    # Custom 404 error page
 │
 ├── Dockerfile                    # Container definition
-├── docker-compose.yml            # Local development
-├── nginx.conf                    # Web server config
+├── docker-compose.yml            # Local Docker development
 ├── .dockerignore                 # Docker build exclusions
+├── .gitignore                    # Git exclusions
 │
-├── .github/
-│   └── workflows/
-│       └── ci-cd.yml            # GitHub Actions pipeline
+├── console-version/              # Node.js implementation
+│   ├── dominoes-game.js         # Core game engine
+│   ├── player-worker.js         # Multi-threaded AI
+│   ├── test-game.js             # Test suite
+│   ├── package.json             # Node dependencies
+│   └── README.md                # Console version docs
 │
-├── helm/
-│   └── dominoes-game/           # Helm chart
-│       ├── Chart.yaml           # Chart metadata
-│       ├── values.yaml          # Default values
-│       ├── values-prod.yaml     # Production overrides
-│       ├── .helmignore
-│       └── templates/
-│           ├── _helpers.tpl     # Template helpers
-│           ├── deployment.yaml  # K8s Deployment
-│           ├── service.yaml     # K8s Service
-│           ├── ingress.yaml     # K8s Ingress (ALB)
-│           ├── hpa.yaml         # Auto-scaler
-│           ├── serviceaccount.yaml
-│           └── NOTES.txt        # Post-install notes
-│
-├── terraform/
-│   ├── main.tf                  # Root module
-│   ├── variables.tf             # Root variables
-│   ├── outputs.tf               # Root outputs
-│   ├── providers.tf             # Provider configs
-│   ├── backend.tf               # State backend
-│   ├── .gitignore
-│   │
-│   ├── modules/
-│   │   ├── vpc/                 # VPC module
-│   │   ├── eks/                 # EKS module
-│   │   ├── ecr/                 # ECR module
-│   │   └── argocd/              # ArgoCD module
-│   │
-│   └── environments/
-│       ├── dev/                 # Dev environment
-│       │   ├── main.tf
-│       │   ├── variables.tf
-│       │   ├── terraform.tfvars
-│       │   └── backend.tf
-│       └── prod/                # Prod environment
-│           ├── main.tf
-│           ├── variables.tf
-│           ├── terraform.tfvars
-│           └── backend.tf
-│
-├── argocd/
-│   ├── install.yaml             # ArgoCD installation
-│   └── applications/
-│       └── dominoes-game.yaml   # App manifest
+├── terraform/                    # Infrastructure as Code
+│   ├── main.tf                  # Main Terraform config
+│   ├── variables.tf             # Input variables
+│   ├── outputs.tf               # Output values
+│   ├── providers.tf             # AWS provider config
+│   ├── terraform.tfvars         # Variable values
+│   ├── deploy.sh                # Deployment script
+│   └── README.md                # Terraform documentation
 │
 └── README.md                    # This file
 ```
+
+---
+
+## Contributing
+
+Contributions are welcome! Here's how you can help:
+
+1. **Fork the Repository**
+   - Click "Fork" on GitHub
+
+2. **Clone Your Fork**
+   ```bash
+   git clone https://github.com/YOUR_USERNAME/Dominoes-Game.git
+   cd Dominoes-Game
+   ```
+
+3. **Create a Feature Branch**
+   ```bash
+   git checkout -b feature/amazing-feature
+   ```
+
+4. **Make Your Changes**
+   - Add new features
+   - Fix bugs
+   - Improve documentation
+   - Add tests
+
+5. **Test Your Changes**
+   ```bash
+   # Test in browser
+   open Dominoes.html
+
+   # Test with Docker
+   docker-compose up --build
+
+   # Test console version
+   cd console-version && npm test
+   ```
+
+6. **Commit Your Changes**
+   ```bash
+   git add .
+   git commit -m "feat: add amazing feature"
+   ```
+
+7. **Push to Your Fork**
+   ```bash
+   git push origin feature/amazing-feature
+   ```
+
+8. **Open a Pull Request**
+   - Go to the original repository
+   - Click "New Pull Request"
+   - Select your feature branch
+   - Describe your changes
+
+### Development Guidelines
+
+- Follow existing code style
+- Add comments for complex logic
+- Test on multiple browsers
+- Update README if needed
+- Keep commits focused and atomic
+
+---
+
+## Troubleshooting
+
+### Docker Issues
+
+**Problem:** Port already in use
+```bash
+# Solution: Use different port
+docker run -p 8082:8080 dominoes-game
+```
+
+**Problem:** Container won't start
+```bash
+# Solution: Check logs
+docker-compose logs
+```
+
+### AWS Deployment Issues
+
+**Problem:** Bucket name already exists
+```bash
+# Solution: Use unique bucket name in terraform.tfvars
+bucket_name = "my-unique-dominoes-game-123"
+```
+
+**Problem:** Access denied
+```bash
+# Solution: Check AWS credentials and permissions
+aws sts get-caller-identity
+```
+
+### Game Issues
+
+**Problem:** Tiles not displaying
+```bash
+# Solution: Clear browser cache and reload
+Cmd/Ctrl + Shift + R
+```
+
+**Problem:** AI not responding
+```bash
+# Solution: Check browser console for errors
+Open DevTools → Console tab
+```
+
+---
+
+## License
+
+This project is open source and available for educational purposes.
+
+---
+
+## Acknowledgments
+
+- Built with vanilla JavaScript for maximum compatibility
+- Designed with responsive web design principles
+- Infrastructure follows AWS best practices
+- Docker configuration optimized for production
+
+---
+
+**Enjoy playing Dominoes!** 🎲
+
+For issues or questions, please open an issue on GitHub.
