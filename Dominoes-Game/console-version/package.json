@@ -1,0 +1,22 @@
+{
+  "name": "dominoes-console-multithreaded",
+  "version": "1.0.0",
+  "description": "Multi-threaded console-based Dominoes game",
+  "main": "dominoes-game.js",
+  "type": "module",
+  "scripts": {
+    "start": "node dominoes-game.js",
+    "test": "node dominoes-game.js"
+  },
+  "keywords": [
+    "dominoes",
+    "multithreading",
+    "game",
+    "console"
+  ],
+  "author": "Arsalan Anwer",
+  "license": "MIT",
+  "dependencies": {
+    "async-mutex": "^0.5.0"
+  }
+}
