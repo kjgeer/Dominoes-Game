@@ -1,8 +1,5 @@
 # Multi-threaded Console Dominoes Game
 
-**Author:** Arsalan Anwer
-**Date:** October 2025
-
 ## Overview
 
 This is a console-based implementation of the Dominoes game with multi-threading support, demonstrating advanced concurrent programming concepts with mutex-protected critical sections.

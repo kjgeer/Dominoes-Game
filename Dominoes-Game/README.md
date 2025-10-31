@@ -397,69 +397,6 @@ Dominoes-Game/
 
 ---
 
-## Contributing
-
-Contributions are welcome! Here's how you can help:
-
-1. **Fork the Repository**
-   - Click "Fork" on GitHub
-
-2. **Clone Your Fork**
-   ```bash
-   git clone https://github.com/YOUR_USERNAME/Dominoes-Game.git
-   cd Dominoes-Game
-   ```
-
-3. **Create a Feature Branch**
-   ```bash
-   git checkout -b feature/amazing-feature
-   ```
-
-4. **Make Your Changes**
-   - Add new features
-   - Fix bugs
-   - Improve documentation
-   - Add tests
-
-5. **Test Your Changes**
-   ```bash
-   # Test in browser
-   open Dominoes.html
-
-   # Test with Docker
-   docker-compose up --build
-
-   # Test console version
-   cd console-version && npm test
-   ```
-
-6. **Commit Your Changes**
-   ```bash
-   git add .
-   git commit -m "feat: add amazing feature"
-   ```
-
-7. **Push to Your Fork**
-   ```bash
-   git push origin feature/amazing-feature
-   ```
-
-8. **Open a Pull Request**
-   - Go to the original repository
-   - Click "New Pull Request"
-   - Select your feature branch
-   - Describe your changes
-
-### Development Guidelines
-
-- Follow existing code style
-- Add comments for complex logic
-- Test on multiple browsers
-- Update README if needed
-- Keep commits focused and atomic
-
----
-
 ## Troubleshooting
 
 ### Docker Issues
@@ -506,12 +443,6 @@ Open DevTools → Console tab
 
 ---
 
-## License
-
-This project is open source and available for educational purposes.
-
----
-
 ## Acknowledgments
 
 - Built with vanilla JavaScript for maximum compatibility
@@ -520,7 +451,3 @@ This project is open source and available for educational purposes.
 - Docker configuration optimized for production
 
 ---
-
-**Enjoy playing Dominoes!** 🎲
-
-For issues or questions, please open an issue on GitHub.

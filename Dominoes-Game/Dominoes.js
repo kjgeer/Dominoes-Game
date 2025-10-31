@@ -8,9 +8,9 @@ function clearHighlights(player) {
         d.onclick = null;
     });
 }
-// ========================================
+
 // LANDING PAGE DOMINOES
-// ========================================
+
 
 function drawLandingDominoes() {
     const canvas1 = document.getElementById('domino1');
@@ -113,9 +113,7 @@ function showGame() {
 }
 
 
-// ========================================
 // GAME LOGIC
-// ========================================
 
 const pipPositions = [
     [],
@@ -704,9 +702,7 @@ function endGame() {
     document.getElementById('continueGameBtn').style.display = 'block';
 }
 
-// ========================================
 // EVENT LISTENERS
-// ========================================
 
 document.addEventListener('DOMContentLoaded', () => {
     // Landing page buttons
